@@ -1,0 +1,14 @@
+{
+    "name": "DimmiCiao",
+    "version": "0.0.1",
+    "description": "A sample Node.js app that interacts with the Message Hub Kafka REST interface",
+    "scripts": {
+        "start": "nodejs app.js"
+    },
+    "dependencies": {
+        "express": "4.12.x",
+        "cfenv": "1.0.x",
+        "socket.io": "1.2.0"
+    },
+    "repository": {}
+}

@@ -1,0 +1,42 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    name: dimmiciao
+  name: dimmiciao
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: dimmiciao
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        name: dimmiciao
+    spec:
+      containers:
+      - image: registry.ng.bluemix.net/ribe/dimmiciao:001
+        imagePullPolicy: IfNotPresent
+        name: dimmiciao
+        ports:
+        - containerPort: 3000
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 500m
+            memory: 2500Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+      imagePullSecrets:
+        - name: dimmisecret
+      restartPolicy: Always
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
