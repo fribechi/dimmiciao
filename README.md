@@ -14,25 +14,38 @@ in 5 punti i passi per portare la propira applicazione su IBM CLOUD
 # La struttura dell'applicazione
 
 Osservare se ci sono e quali sono le dipendenze
+
 Individuare se devono essere eseguiti dei passi di configurazione
+
 Determinare il modo in cui l’applicazione viene lanciata
 
 Nel nostro esempio l'applicazione e' un semplice server nodejs con alcune pagine statiche
 Sappiamo che:
+
    dobbiamo girare npm install per caricare le dipendenze
+
    per lanciarla dobbiamo eseguire il comnado node app.js se in mac o nodejs app.js se in liunx
+
    una volta lanciata, aprendo un browser ed eseguendo http://localhost:3000 si vedra la pagina di login
+
    se scrive un nome e si preme login apparira' il messaggio di saluto
+
    premendo log out si tornera' alla situazione iniziale.
 
 # Costruire il contenitore Docker
 
 Viene qua fornito un dockerfile che contiene le istruzioni per la creazione del contenitore. 
+
 Questo dipende dalla struttura dell’applicazione
+
 Installa dipendenze
+
 Copia i file dell’applicazione
+
 Esegue configurazioni
+
 Esegue il comando di partenza dell’applicazione
+
 Creato il dockerfile si costruisce il contenitore e se ne testa il funzionamento
 
 Ecco i passi per la creazione e l'esecuzione del dockerfile:
@@ -48,7 +61,9 @@ A questo punto l'applicazione si troverà alla nuova pagina
 
 Il Docker registry e’ un repository per rendere od avere disponibili i contenitori creati
 Ci sono diversi tipi di Docker Registry. IBM CLOUD ne ha uno al suo interno
+
 Disponibile anche per i free accounts di prova
+
 Può suddividere i contenitori classificandoli sotto nomi diversi (namespaces)
 Operativamente basta nominare l’immagine del contenitore in modo opportuno
 Ed eseguire il comando di trasferimeneto (push)
