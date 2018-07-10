@@ -19,11 +19,11 @@ Determinare il modo in cui l’applicazione viene lanciata
 
 Nel nostro esempio l'applicazione e' un semplice server nodejs con alcune pagine statiche
 Sappiamo che:
-    - dobbiamo girare npm install per caricare le dipendenze
-    - per lanciarla dobbiamo eseguire il comnado node app.js se in mac o nodejs app.js se in liunx
-    - una volta lanciata, aprendo un browser ed eseguendo http://localhost:3000 si vedra la pagina di login
-    - se scrive un nome e si preme login apparira' il messaggio di saluto
-    - premendo log out si tornera' alla situazione iniziale.
+   dobbiamo girare npm install per caricare le dipendenze
+   per lanciarla dobbiamo eseguire il comnado node app.js se in mac o nodejs app.js se in liunx
+   una volta lanciata, aprendo un browser ed eseguendo http://localhost:3000 si vedra la pagina di login
+   se scrive un nome e si preme login apparira' il messaggio di saluto
+   premendo log out si tornera' alla situazione iniziale.
 
 # Costruire il contenitore Docker
 
