@@ -36,10 +36,13 @@ Esegue il comando di partenza dell’applicazione
 Creato il dockerfile si costruisce il contenitore e se ne testa il funzionamento
 
 Ecco i passi per la creazione e l'esecuzione del dockerfile:
+    
     docker build . -t fst/dimmiciao
     docker run -p 3020:3000 --name ciao ./dimmiciao
     
-    A questo punto l'applicazione si troverà alla nuova pagina http://localhost:3020
+A questo punto l'applicazione si troverà alla nuova pagina 
+    
+    http://localhost:3020
 
 # Il registro docker
 
