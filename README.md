@@ -1,143 +1,135 @@
-# dimmiciao 
-Come portare una propria applicazione dal proprio computer ad IBM CLOUD, rendendola disponibile al mondo
+# saymeciao 
+A sample how to move your own application from your local computer to IBM Cloud, make it available to the world.
 
-# Una checklist da seguire
-in 5 punti i passi per portare la propira applicazione su IBM CLOUD
+# A checklist to follow
+Here are a 5 steps checklist to move your application to IBM Cloud
 
-1) Conoscere la struttura dell’applicazione
-2) Costruire il contenitore Docker
-3) Immagazzinare l’immagine del contenitore in un registro Docker 
-4) Provare in ambito locale il caricamento del contenitore Docker  su un cluster kubernetes
-5) Caricare il contenitore sul cluster kubernetes IBM CLOUD e verificare la sua disponibilità
+1) Understand the application architecture.
+2) Build the Docker image
+3) Push the docher image into a docker registry. 
+4) Test locally ro run the image as Docke rcontainer on a kubernetes cluster.
+5) Upload the docker container onto the kubernetes cluster in IBM CLOUD and verify the endpoint availability.
 
 
-# La struttura dell'applicazione
+# The application architecture
 
-Osservare se ci sono e quali sono le dipendenze
+Detect and check any eventual dependency.
 
-Individuare se devono essere eseguiti dei passi di configurazione
+Establish the way in which the application is launched.
 
-Determinare il modo in cui l’applicazione viene lanciata
+In our sample the application is a simple server nodejs using some static pages.
+We know that:
 
-Nel nostro esempio l'applicazione e' un semplice server nodejs con alcune pagine statiche
-Sappiamo che:
-
-   dobbiamo girare npm install per caricare le dipendenze
-
-   per lanciarla dobbiamo eseguire il comnado node app.js se in mac o nodejs app.js se in liunx
-
-   una volta lanciata, aprendo un browser ed eseguendo http://localhost:3000 si vedra la pagina di login
-
-   se scrive un nome e si preme login apparira' il messaggio di saluto
-
-   premendo log out si tornera' alla situazione iniziale.
+- we need to run npm install to load dependencies
+- we use the command `node app.js` in mac or `nodejs app.js` in linux to start the application
+- locally the address of the login page is http://localhost:3000
+- writng a name and pressin login a message is displayed
+- pressing log out the page is reset
 
 # Costruire il contenitore Docker
 
-Viene qua fornito un dockerfile che contiene le istruzioni per la creazione del contenitore. 
+Here is a dockrfile containing instructions to build the application image.
 
-Questo dipende dalla struttura dell’applicazione
+The image obviously depends on application architecture.
 
-Installa dipendenze
+It installs the dependencies, copies application files, configure the environment and start the application
 
-Copia i file dell’applicazione
-
-Esegue configurazioni
-
-Esegue il comando di partenza dell’applicazione
-
-Creato il dockerfile si costruisce il contenitore e se ne testa il funzionamento
-
-Ecco i passi per la creazione e l'esecuzione del dockerfile:
-    
+Build the image and test its way of working with following steps
+```   
     docker build . -t fst/dimmiciao
     docker run -p 3020:3000 --name ciao ./dimmiciao
-    
-A questo punto l'applicazione si troverà alla nuova pagina 
-    
+```
+As expected the application appear at the adress`
+```
     http://localhost:3020
+```
 
-# Il registro docker
+# IBM Cloud Container Registry
 
-Il Docker registry e’ un repository per rendere od avere disponibili i contenitori creati
-Ci sono diversi tipi di Docker Registry. IBM CLOUD ne ha uno al suo interno
+IBM Cloud Container Registry is a private docker registry useful to store docker images to have them available when needed 
+It is available also for free accounts, obviously for a limited number of images.
 
-Disponibile anche per i free accounts di prova
+Inside the IBM Cloud Container Registry images can be divided and classified using namespaces.
+In the free version only a namespace is available.
+To store an image into the desired namespace we need to rename the image using the command `docker tag`
+And then execute a command `docker push` as following
 
-Può suddividere i contenitori classificandoli sotto nomi diversi (namespaces)
-Operativamente basta nominare l’immagine del contenitore in modo opportuno
-Ed eseguire il comando di trasferimeneto (push)
 
-Di seguito i comando per immagazzinare il contenitore nel registro docker
+    ibmcloud login --apikey $AT_APIKEY_PUBLIC                       (Login to ibmcloud using your own apikey)
+    ibmcloud cr login                                               (Login to IBM Cloud Container Registry)
 
-    bx login -a https://api.ng.bluemix.net -u <username> -p xxxx    (Eseguire il login ad IBM CLOUD con il proprio utente IBM)
-    bx cr login                                                     (Eseguire il login al conatiner registry)
+    ibmcloud cr namespace-add myspace                               (Create your own namespace)
 
-    bx cr namespace-add myspace                                     (creare un propio namespace)
+    docker tag fst/dimmiciao us.icr.io/myspace/dimmiciao:001        (Rename the container to store into registry)
+    docker push us.icr.io/myspace/dimmiciao:001                     (Store the container)
 
-    docker build . -t registry.ng.bluemix.net/myspace/dimmiciao:001 (creare un contenitore con nome già predisposto per il registro)
-    docker push registry.ng.bluemix.net/ribe/dimmiciao:001          (immagazzinare il container con il comando push)
-
-    bx cr images                                                    (verificare il contenitore sia presente tra i contenitori disponibili)
+    ibmcloud cr images                                              (Verify the image is available)
     
     
-# Test di installazione su cluster kubernetes sul proprio computer
+# Test the image locally using minikube
 
-Le operazioni elencate possono essere provate e testate su un cluster locale, prima di passare a IBM Cloud
-Minikube è lo strumento per I test in locale
-Più veloce ed previene danni per operazioni non volute
-Una volta installato i comandi sono :
+The correct working of our image containing our application can be tested locally using minikube as local cluster.
+In this way we can quickly check that anything is working as expected
+Minikube commands are:
     
     minikube start
     minikube status 
     minikube stop
 
-Una volta verificata la corretta partenza di minikube abbiamo bisogno di accedere al docker registry dove abbiamo inserito il nostro 
-contenitore.
-1) Creare una credenziale in kubernetes per poter accedere al Docker registry (secret)
-Istruzioni a https://console.bluemix.net/docs/containers/cs_dedicated_tokens.html
-Chiedere Token per eseguire l’operazione relativo al proprio utente IBM CLOUD
-Individuare la propria organizzazione
-Con organizzazione e token autorizzazione chiedere il token password per accedere al Docker Registry
-Ottenuto il token password si puo' costruire il secret kubernetes che agirà come credenziale per il recupero del contenitore
-    kubectl create secret docker-registry dimmisecret --docker-server=https://registry.ng.bluemix.net --docker-username=token --docker-password=< token password> --docker-email=<user-email del login IBMCLOUD>
+Once minikube is started, it should be enabled to access our private registry where we stored the application image.
+
+1) Store in the kubernetes cluster your credentials to access your private registry in the form of a PullSecret.
+This task can be accomplished with following command:
+```
+kubectl --namespace <cluster-namespace>  create secret docker-registry <secret-name> --docker-server=<registry-endpoint> --docker-password=<ibmcloud apikey> --docker-username=iamapikey --docker-email=<your email>
+
+as for instance
+kubectl --namespace default  create secret docker-registry minikube-auditree-runner-us.icr.io --docker-server=us.icr.io --docker-password=N37ywUU2lXXXXXXXXXXXXXXXXXXX --docker-username=iamapikey --docker-email=fausto.ribechini@it.ibm.com
+```
+
+2) Create a kubernetes Service, configuring the access point of the application from external. 
+   A standard file is here.
 
 
-2) Creare un Servizio kubernetes che rappresenta il punto di ingresso all’applicazione dall’esterno. Il file e' contenuto in questo repository
     kubectl create -f ./kubernates/dimmiciao-service.yml
-3) Caricare il contenitore all’interno del cluster  
+   
+    
+3) Deploy the image into the cluster 
+
+    
     kubectl create -f ./kubernetes/dimmiciao-deploy.yml
-4) verificarne il funzionamento (port forward)
-    kubectl port-forward dimmiciao-69bd84845c-mj8sk 3030:3000
-A questo punto l'applicazione sarà disponibile sul vostro computer all'indirizzo http://localhost:3030
+
+4) Verify it is working by mapping the port of the application to a different port number.
+   
+    kubectl port-forward dimmiciao-69bd84845c-mj8sk 3030:3000``
+    
+Ìn this way the aplication is available on your computer to the adress http://localhost:3030
 
 # Caricamento su IBM CLOUD
 
-Le operazioni testate e verificate su Minikube possono ripetersi sul cluster IBM CLOUD
-Deve essere creato un cluster con una utenza abilitata a farlo.
-Poi si connette il cluster:
-    
-    bx cs clusters
-    bx cs cluster-config <cluster>
-    
-    il comando riporterà una variabile da settare nell'ambiente per connettere il cluster
-    export KUBECONFIG=/Users/<name>/.bluemix/plugins/container-service/clusters/<cluster>/kube-config-<cluster>.yml
+Àll the steps previously performed and verified on Minikube cluster can be repeated on IBM CLOUD cluster
+Thus start creating a cluster in IBM Cloud
 
-A questo punto si possono ripetere i comandi già testati in Minikube
+Then configuring our ibmcloud cli interface to work with that cluster:
 
-Creazione secret            kubectl create secret docker-registry dimmisecret --docker-server=https://registry.ng.bluemix.net --docker-username=token --docker-password=< token password> --docker-email=<user-email del login IBMCLOUD>
+    ibmcloud ks clusters
+    ibmcloud ks cluster config --cluster <cluster>
 
-Creazione service           kubectl create -f ./kubernates/dimmiciao-service.yml
+At this point you can repeat same commands as you run for Minikube
 
-Creazione deploy            kubectl create -f ./kubernetes/dimmiciao-deploy.yml
+- Create a secret:           `kubectl --namespace <cluster-namespace>  create secret docker-registry <secret-name> --docker-server=<registry-endpoint> --docker-password=<ibmcloud apikey> --docker-username=iamapikey --docker-email=<your email>`
 
-Allora si può individuare l’ip pubblico disponibile per i nodi del cluster
+- Create service:            `kubectl create -f ./kubernates/dimmiciao-service.yaml`
+
+- Create deploy:             `kubectl create -f ./kubernetes/dimmiciao-deploy.yaml`
+
+Now you can determine the public ip available for cluster worker nodes by command 
         
-        bx cs workers <cluster>
+        ibmcloud ks workers --cluster <cluster>
 
-Individuazione della porta dal servizio
+and the service port number by service configuration
         
         kubectl get service dimmiciao-service
 
-Lanciando  http://ip_pubblico:porta si arriva all’applicazione che ora e' disponibile in tutto il mondo a quell'indirizzo
+Your application is now available at address `http://public_ip:port` and can be reached by everyone in the world.
 

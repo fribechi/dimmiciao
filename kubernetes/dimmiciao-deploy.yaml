@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
@@ -22,7 +22,7 @@ spec:
         name: dimmiciao
     spec:
       containers:
-      - image: registry.ng.bluemix.net/ribe/dimmiciao:001
+      - image: us.icr.io/fstkube/dimmiciao:01
         imagePullPolicy: IfNotPresent
         name: dimmiciao
         ports:
@@ -36,7 +36,7 @@ spec:
             cpu: 100m
             memory: 100Mi
       imagePullSecrets:
-        - name: dimmisecret
+        - name: ibmcloud-us.icr.io
       restartPolicy: Always
       securityContext: {}
       terminationGracePeriodSeconds: 30
